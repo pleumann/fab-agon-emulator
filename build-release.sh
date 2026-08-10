@@ -1,5 +1,7 @@
 #!/bin/bash
 
+./dist_scripts/make-dist-linux-flatpak.sh
+
 # zipped up binaries will be written to ./artifacts
 mkdir -p artifacts
 
