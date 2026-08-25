@@ -5,6 +5,10 @@
 
 extern bool vdp_debug_logging; /* in rust_glue.cpp */
 
+// TODO no need to override this, could use version in
+// video.ino (with 'vdp_debug_logging' change), as
+// DBGSerial now redirects to host stdout
+// (see HardwareSerial m_hacky_debug_output_to_stdout)
 static inline void debug_log(const char *format, ...)
 {
 	if (vdp_debug_logging) {
