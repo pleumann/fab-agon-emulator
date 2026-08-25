@@ -76,6 +76,7 @@ purposes:
 | 0x00          | Terminate emulator (exit code will be the value written to IO 0x0) |
 | 0x10-0x1f     | Breakpoint (requires --debugger)                                   |
 | 0x20-0x2f     | Print CPU state (requires --debugger)                              |
+| 0x30          | Echo the written char to host stdout                               |
 
 These functions are activated by write (not read), and the upper 8-bits of the
 IO address are ignored. ie:

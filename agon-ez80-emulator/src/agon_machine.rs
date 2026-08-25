@@ -479,6 +479,9 @@ impl Machine for AgonMachine {
                         .store(value as i32, std::sync::atomic::Ordering::Relaxed);
                     self.emulator_shutdown
                         .store(true, std::sync::atomic::Ordering::Relaxed);
+                } else if address & 0xff == 0x30 {
+                    // Echo ascii value to host stdout
+                    print!("{}", value as char);
                 } else {
                     // the debugger will handle some of these
                     self.io_unhandled.set(Some(address));
@@ -1122,6 +1125,9 @@ impl AgonMachine {
     }
 
     fn hostfs_mos_f_mount(&mut self, cpu: &mut Cpu) {
+        // Reset the current directory
+        self.mos_current_dir = MosPath(std::path::PathBuf::new());
+
         // always success. hostfs is mounted
         cpu.state.reg.set24(Reg16::HL, 0); // ok
         Environment::new(&mut cpu.state, self).subroutine_return();
