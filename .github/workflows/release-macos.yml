@@ -25,9 +25,6 @@ jobs:
 
       - name: Build macOS binary
         run: |
-          export SDL3_LIB_DIR="$(brew --prefix)/lib"
-          export SDL3_INCLUDE_DIR="$(brew --prefix)/include/SDL3"
-          export SDL3_STATIC=0
           export CMAKE_POLICY_VERSION_MINIMUM=3.5
 
           make clean
@@ -41,8 +38,11 @@ jobs:
           rm -rf $DIST_DIR
           mkdir $DIST_DIR
           cp ./fab-agon-emulator $DIST_DIR
+          dist_scripts/bundle-macos-sdl3.sh $DIST_DIR/fab-agon-emulator
           cp -r ./firmware $DIST_DIR
           cp LICENSE README.md $DIST_DIR
+          mkdir $DIST_DIR/THIRD-PARTY-LICENSES
+          cp dist_scripts/THIRD-PARTY-LICENSES/*.txt $DIST_DIR/THIRD-PARTY-LICENSES/
           mkdir $DIST_DIR/sdcard
           cp -r sdcard/* $DIST_DIR/sdcard/
           zip ${DIST_DIR}.zip -r $DIST_DIR/*
