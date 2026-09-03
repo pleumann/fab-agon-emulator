@@ -3,6 +3,7 @@ name: Build macOS release binary
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   build-macos:
@@ -32,7 +33,7 @@ jobs:
           FORCE=1 cargo build -r --target=aarch64-apple-darwin
           cp ./target/aarch64-apple-darwin/release/fab-agon-emulator ./fab-agon-emulator
 
-          VERSION="${{ github.ref_name }}"
+          VERSION="${{ github.event.release.tag_name || github.ref_name }}"
           DIST_DIR=fab-agon-emulator-v${VERSION}-macos-arm64
 
           rm -rf $DIST_DIR
@@ -50,6 +51,14 @@ jobs:
           echo "DIST_ZIP=${DIST_DIR}.zip" >> $GITHUB_ENV
 
       - name: Upload artifact to release
+        if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ env.DIST_ZIP }}
+
+      - name: Upload build artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.DIST_ZIP }}
+          path: ${{ env.DIST_ZIP }}
