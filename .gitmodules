@@ -1,12 +1,16 @@
 [submodule "src/vdp/userspace-vdp-gl"]
 	path = src/vdp/userspace-vdp-gl
-	url = https://github.com/tomm/userspace-vdp-gl.git
+	# TODO: point back at https://github.com/tomm/userspace-vdp-gl.git once
+	# https://github.com/pleumann/userspace-vdp-gl/tree/macos-fixes is merged upstream
+	url = https://github.com/pleumann/userspace-vdp-gl.git
 [submodule "sdcard"]
 	path = sdcard
 	url = https://github.com/tomm/popup-mos.git
 [submodule "src/vdp/vdp-console8"]
 	path = src/vdp/vdp-console8
-	url = https://github.com/tomm/agon-vdp
+	# TODO: point back at https://github.com/tomm/agon-vdp once
+	# https://github.com/pleumann/agon-vdp/tree/macos-fixes is merged upstream
+	url = https://github.com/pleumann/agon-vdp.git
 [submodule "src/vdp/vdp-quark"]
 	path = src/vdp/vdp-quark
 	url = https://github.com/tomm/agon-vdp
