@@ -27,6 +27,7 @@ pub struct VdpInterface {
         libloading::Symbol<'static, unsafe extern "C" fn(out: *mut u8, length: u32)>,
     pub dump_vdp_mem_stats: libloading::Symbol<'static, unsafe extern "C" fn()>,
     pub vdp_shutdown: libloading::Symbol<'static, unsafe extern "C" fn()>,
+    pub vdp_shutdown_complete: libloading::Symbol<'static, unsafe extern "C" fn() -> bool>,
 }
 
 impl VdpInterface {
@@ -48,6 +49,7 @@ impl VdpInterface {
                 getAudioSamples: lib.get(b"getAudioSamples").unwrap(),
                 dump_vdp_mem_stats: lib.get(b"dump_vdp_mem_stats").unwrap(),
                 vdp_shutdown: lib.get(b"vdp_shutdown").unwrap(),
+                vdp_shutdown_complete: lib.get(b"vdp_shutdown_complete").unwrap(),
             };
         }
     }

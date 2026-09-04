@@ -16,6 +16,7 @@ extern HardwareSerial Serial2;
 
 bool vdp_debug_logging = false;
 uint32_t startup_screen_mode = 0;
+bool process_loop_finished = false;
 
 extern "C" bool z80_uart0_is_cts()
 {
@@ -152,6 +153,14 @@ extern "C" void vdp_loop() {
 
 extern "C" void vdp_shutdown() {
 	is_fabgl_terminating = true;
+}
+
+// Whether the processLoop task has actually stopped touching shared VDP
+// state (the VGA controller, etc) after vdp_shutdown() was called. The task
+// runs on a detached thread with no join handle, so this is how the host
+// finds out it's safe to tear things down instead of guessing with a delay.
+extern "C" bool vdp_shutdown_complete() {
+	return process_loop_finished;
 }
 
 extern "C" void dump_vdp_mem_stats() {

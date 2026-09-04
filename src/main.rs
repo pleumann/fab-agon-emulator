@@ -777,11 +777,22 @@ pub fn main_loop() -> i32 {
     // signal the shutdown to any other listeners
     emulator_shutdown.store(true, std::sync::atomic::Ordering::Relaxed);
 
-    // give vdp some time to shutdown
+    // Ask the VDP side to stop, then wait for its processing thread to
+    // actually confirm it's done before returning - our return value flows
+    // into std::process::exit(), which runs C++ global destructors
+    // (tearing down the VGA controller etc). That thread is detached with
+    // no join handle, so without waiting here those destructors can race
+    // with it still running, crashing on quit. The deadline is just a
+    // safety net in case the thread never checks in.
     unsafe {
         (*vdp_interface.vdp_shutdown)();
     }
-    std::thread::sleep(std::time::Duration::from_millis(200));
+    let shutdown_deadline = std::time::Instant::now() + std::time::Duration::from_millis(2000);
+    while !unsafe { (*vdp_interface.vdp_shutdown_complete)() }
+        && std::time::Instant::now() < shutdown_deadline
+    {
+        std::thread::sleep(std::time::Duration::from_millis(5));
+    }
 
     return exit_status.load(std::sync::atomic::Ordering::Relaxed);
 }
