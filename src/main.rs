@@ -374,6 +374,16 @@ pub fn main_loop() -> i32 {
         window.set_mouse_grab(is_fullscreen);
         sdl_context.mouse().show_cursor(!is_fullscreen);
 
+        // macOS windows have rounded bottom corners that clip content drawn
+        // all the way to the window edge; leave some room so nothing is lost
+        // behind the curve. Not needed in fullscreen (no window chrome then)
+        // or on other platforms.
+        let bottom_padding_px: u32 = if cfg!(target_os = "macos") && !is_fullscreen {
+            (16.0 * window.display_scale()) as u32
+        } else {
+            0
+        };
+
         let mut canvas = {
             match args.renderer {
                 parse_args::Renderer::Software => sdl3::render::create_renderer(
@@ -720,11 +730,24 @@ pub fn main_loop() -> i32 {
             }
 
             /* Keep rendered output to 4:3 aspect ratio */
-            let dst = Some(calc_4_3_output_rect(
-                canvas.output_size().unwrap(),
+            let (out_w, out_h) = canvas.output_size().unwrap();
+            let mut dst = calc_4_3_output_rect(
+                (out_w, out_h),
                 (mode_w, mode_h),
                 screen_scale,
-            ));
+            );
+            // Leave room at the bottom for macOS's rounded window corners
+            // (see bottom_padding_px above), without touching x/w (no left/
+            // right change) or moving the top edge - shrink the height
+            // instead, so a gap opens up below regardless of where the
+            // content currently sits.
+            if bottom_padding_px > 0 {
+                let available_below = out_h as f32 - (dst.y + dst.h);
+                if available_below < bottom_padding_px as f32 {
+                    dst.h -= bottom_padding_px as f32 - available_below;
+                }
+            }
+            let dst = Some(dst);
 
             canvas.set_draw_color(sdl3::pixels::Color {
                 r: (args.border >> 16) as u8,
