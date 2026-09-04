@@ -31,6 +31,7 @@ jobs:
           make vdp
           FORCE=1 cargo build -r --target=aarch64-apple-darwin
           cp ./target/aarch64-apple-darwin/release/fab-agon-emulator ./fab-agon-emulator
+          cargo build -r --target=aarch64-apple-darwin --manifest-path=./agon-cli-emulator/Cargo.toml
 
           VERSION="${{ github.ref_name }}"
           DIST_DIR=fab-agon-emulator-v${VERSION}-macos-arm64
@@ -38,6 +39,7 @@ jobs:
           rm -rf $DIST_DIR
           mkdir $DIST_DIR
           cp ./fab-agon-emulator $DIST_DIR
+          cp ./target/aarch64-apple-darwin/release/agon-cli-emulator $DIST_DIR
           dist_scripts/bundle-macos-sdl3.sh $DIST_DIR/fab-agon-emulator
           cp -r ./firmware $DIST_DIR
           cp LICENSE README.md $DIST_DIR
