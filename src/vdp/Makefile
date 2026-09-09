@@ -19,7 +19,7 @@ OBJS = $(SRCS:.cpp=$(SUFFIX).o)
 	$(CXX) $(CFLAGS) $(OPTIONS) -c $< -o $@
 
 all: userspace-vdp-gl/vdp_gl$(SUFFIX).a vdp_console8$(SUFFIX).so \
-	vdp_quark$(SUFFIX).so vdp_electron$(SUFFIX).so
+	vdp_electron$(SUFFIX).so
 
 userspace-vdp-gl/vdp_gl$(SUFFIX).a:
 	$(MAKE) -C userspace-vdp-gl/src
@@ -30,9 +30,6 @@ test_main$(SUFFIX): $(OBJS) userspace-vdp-gl/vdp_gl$(SUFFIX).a test_main$(SUFFIX
 vdp_console8$(SUFFIX).so: $(OBJS) userspace-vdp-gl/vdp_gl$(SUFFIX).a vdp-console8$(SUFFIX).o
 	$(CXX) $(CFLAGS) $(CONSOLE8_CFLAGS) -shared $(OBJS) vdp-console8$(SUFFIX).o userspace-vdp-gl/src/vdp-gl$(SUFFIX).a -o vdp_console8$(SUFFIX).so
 
-vdp_quark$(SUFFIX).so: $(OBJS) userspace-vdp-gl/vdp_gl$(SUFFIX).a vdp-quark$(SUFFIX).o
-	$(CXX) $(CFLAGS) -shared $(OBJS) vdp-quark$(SUFFIX).o userspace-vdp-gl/src/vdp-gl$(SUFFIX).a -o vdp_quark$(SUFFIX).so
-
 vdp_electron$(SUFFIX).so: $(OBJS) userspace-vdp-gl/vdp_gl$(SUFFIX).a vdp_electron$(SUFFIX).o
 	$(CXX) $(CFLAGS) $(ELECTRONHAL_CFLAGS) -shared $(OBJS) vdp_electron$(SUFFIX).o userspace-vdp-gl/src/vdp-gl$(SUFFIX).a -o vdp_electron$(SUFFIX).so
 
@@ -41,7 +38,7 @@ clean:
 	-rm *.so
 	$(MAKE) -C userspace-vdp-gl/src clean
 
-SRC_ALL = $(SRCS) vdp-console8.cpp vdp-quark.cpp vdp_electron.cpp
+SRC_ALL = $(SRCS) vdp-console8.cpp vdp_electron.cpp
 
 depends: $(SRC_ALL)
 	$(CXX) -MM $(CFLAGS) $(CONSOLE8_CFLAGS) $(ELECTRONHAL_CFLAGS) $(SRC_ALL) > Makefile.dep
