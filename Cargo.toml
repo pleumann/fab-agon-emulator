@@ -21,7 +21,7 @@ license.workspace = true
 #sdl3 = "0.14.36"
 
 [dependencies]
-sdl3 = "0.14.36"
+sdl3 = { version = "0.14.36", features = ["use-pkg-config"] }
 sdl3-sys = "*"
 pico-args = "0.5.0"
 agon-ez80-emulator = { workspace = true }
