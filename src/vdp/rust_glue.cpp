@@ -42,6 +42,26 @@ extern "C" void setVdpDebugLogging(bool state)
 	vdp_debug_logging = state;
 }
 
+/* Redirect the VDP's "printer" output (VDU 2) from host stdout into a file.
+ * Returns false if the file could not be opened, so the host can complain
+ * rather than silently carrying on writing to stdout.
+ *
+ * Note we can't hook DBGSerial itself here: it only exists in the console8
+ * firmware, while this file is linked into vdp_electron.so as well. */
+extern "C" bool vdp_set_printer_file(const char *path)
+{
+	FILE *f = fopen(path, "w");
+
+	if (f == nullptr) {
+		return false;
+	}
+
+	// unbuffered, so that `tail -f` on the file follows along live
+	setvbuf(f, nullptr, _IONBF, 0);
+	dbg_serial_sink = f;
+	return true;
+}
+
 extern "C" void set_startup_screen_mode(uint32_t mode)
 {
 	startup_screen_mode = mode;
