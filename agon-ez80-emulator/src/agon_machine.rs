@@ -1288,7 +1288,7 @@ impl AgonMachine {
                         match f.set_len(pos) {
                             Ok(_) => {
                                 // store new file len in fatfs FIL structure
-                                self._poke24(fptr + mos::FIL_MEMBER_OBJSIZE, pos as u32);
+                                self._poke32(fptr + mos::FIL_MEMBER_OBJSIZE, pos as u32);
 
                                 // success
                                 cpu.state.reg.set24(Reg16::HL, 0);
@@ -1432,7 +1432,7 @@ impl AgonMachine {
                 f.seek(SeekFrom::Start(file_pos)).unwrap();
 
                 // store file len in fatfs FIL structure
-                self._poke24(fptr + mos::FIL_MEMBER_OBJSIZE, file_len as u32);
+                self._poke32(fptr + mos::FIL_MEMBER_OBJSIZE, file_len as u32);
 
                 // store mapping from MOS *FIL to rust File
                 self.open_files.insert(fptr, f);
