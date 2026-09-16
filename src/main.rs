@@ -451,12 +451,12 @@ pub fn main_loop() -> i32 {
                         ..
                     } => {
                         let hostkey = if args.alternative_hostkey {
-                            sdl3::keyboard::Mod::RALTMOD
+                            sdl3::keyboard::Mod::RALTMOD | sdl3::keyboard::Mod::MODEMOD
                         } else {
                             sdl3::keyboard::Mod::RCTRLMOD
                         };
                         // handle emulator shortcut keys
-                        let consumed = if keymod.contains(hostkey) {
+                        let consumed = if keymod.intersects(hostkey) {
                             match keycode {
                                 Some(sdl3::keyboard::Keycode::_1) => {
                                     video_src = VideoSource::Vdp;
