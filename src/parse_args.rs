@@ -17,7 +17,7 @@ OPTIONS:
   --mode <n>            Start in a specific screen mode
   --mouse-accel <n>     Accelerate mouse by <n>x
   --osk                 Enable on-screen-keyboard input (requires OS osk)
-  --printer-file <path> Write VDU 2 \"printer\" output to this file
+  --printer-file <path> Append VDU 2 \"printer\" output to this file
   --ralt-hostkey        Use right-alt (AltGr) as the emulator host key
   --scale 4:3           (default) Scale Agon screen to 4:3 aspect ratio
   --scale integer       Scale Agon screen to an integer multiple

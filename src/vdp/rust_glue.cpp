@@ -50,7 +50,8 @@ extern "C" void setVdpDebugLogging(bool state)
  * firmware, while this file is linked into vdp_electron.so as well. */
 extern "C" bool vdp_set_printer_file(const char *path)
 {
-	FILE *f = fopen(path, "w");
+	// appending, so that an existing log survives and several runs add to it
+	FILE *f = fopen(path, "a");
 
 	if (f == nullptr) {
 		return false;
