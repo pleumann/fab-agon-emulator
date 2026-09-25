@@ -1,0 +1,74 @@
+#
+# Builds a Windows x64 binary and offers it as a downloadable artifact, so that
+# the emulator can be tested on Windows without installing MSYS2 locally. Start
+# it by hand from the Actions tab, on whichever branch you want built.
+#
+# This mirrors the developer setup in docs/compiling.md (MSYS2, UCRT64) rather
+# than dist_scripts/make-dist-windows.sh, which cross-compiles from Linux and
+# expects an SDL3 tarball to have been unpacked by hand. Here pacman provides
+# SDL3 instead.
+#
+name: Build Windows binary
+
+on: workflow_dispatch
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up MSYS2 (UCRT64)
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          # pkgconf is needed because the sdl3 crate is built with its
+          # "use-pkg-config" feature (see Cargo.toml)
+          install: >-
+            make
+            zip
+            pkgconf
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-rust
+            mingw-w64-ucrt-x86_64-sdl3
+
+      - name: Build
+        run: |
+          make vdp
+          # Not `make cargo`: its Windows branch sets FORCE with cmd syntax,
+          # which does nothing under a shell, and build.rs then refuses to run
+          FORCE=1 cargo build -r
+          FORCE=1 cargo build -r --manifest-path=./agon-cli-emulator/Cargo.toml
+
+      - name: Assemble the distribution
+        run: |
+          DIST_DIR=fab-agon-emulator-windows-x64
+          rm -rf "$DIST_DIR"
+          mkdir "$DIST_DIR"
+
+          cp ./target/release/fab-agon-emulator.exe "$DIST_DIR"
+          cp ./target/release/agon-cli-emulator.exe "$DIST_DIR"
+          cp -r ./firmware "$DIST_DIR"
+          mkdir "$DIST_DIR/sdcard"
+          cp -r sdcard/* "$DIST_DIR/sdcard/"
+          cp LICENSE README.md "$DIST_DIR"
+
+          # The .exe finds none of these on a machine without MSYS2, so they
+          # have to travel with it. ucrtbase.dll itself ships with Windows.
+          for dll in SDL3.dll libgcc_s_seh-1.dll libstdc++-6.dll libwinpthread-1.dll; do
+            cp "/ucrt64/bin/$dll" "$DIST_DIR"
+          done
+
+      - name: Upload the artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fab-agon-emulator-windows-x64
+          path: fab-agon-emulator-windows-x64/
