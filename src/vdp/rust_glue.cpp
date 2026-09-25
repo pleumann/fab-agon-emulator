@@ -1,3 +1,4 @@
+#include <cstdio>
 #include "fabutils.h"
 #include "fake_fabgl.h"
 #include "fabgl.h"
@@ -50,8 +51,11 @@ extern "C" void setVdpDebugLogging(bool state)
  * firmware, while this file is linked into vdp_electron.so as well. */
 extern "C" bool vdp_set_printer_file(const char *path)
 {
-	// appending, so that an existing log survives and several runs add to it
-	FILE *f = fopen(path, "a");
+	// Appending, so that an existing log survives and several runs add to it.
+	// Binary, so that the guest's bytes reach the file unaltered: the Windows
+	// CRT translates a written LF into CR/LF, and the Agon ends its lines with
+	// a CR/LF of its own already.
+	FILE *f = fopen(path, "ab");
 
 	if (f == nullptr) {
 		return false;
